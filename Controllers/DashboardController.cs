@@ -1,0 +1,5 @@
+using AcxiomCRM.Data;using Microsoft.AspNetCore.Authorization;using Microsoft.AspNetCore.Mvc;using Microsoft.EntityFrameworkCore;
+namespace AcxiomCRM.Controllers;
+[Authorize] public class DashboardController(ApplicationDbContext db):Controller{
+ public async Task<IActionResult> Index(){var q=db.Customers.AsQueryable();var l=db.Leads.AsQueryable();var o=db.Opportunities.AsQueryable();var f=db.FollowUps.AsQueryable();if(!User.IsInRole("Admin")&&!User.IsInRole("Manager")){var id=User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;q=q.Where(x=>x.OwnerId==id);l=l.Where(x=>x.OwnerId==id);o=o.Where(x=>x.OwnerId==id);f=f.Where(x=>x.AssignedUserId==id);}ViewBag.Customers=await q.CountAsync();ViewBag.Leads=await l.CountAsync(x=>x.Status!="Converted"&&x.Status!="Lost");ViewBag.Opportunities=await o.CountAsync(x=>x.Stage!="Won"&&x.Stage!="Lost");var pipelineRows=await o.Where(x=>x.Stage!="Won"&&x.Stage!="Lost").Select(x=>new{x.Amount,x.Probability}).ToListAsync();ViewBag.Pipeline=pipelineRows.Sum(x=>x.Amount*x.Probability/100m);ViewBag.FollowUps=await f.CountAsync(x=>x.Status=="Planned"&&x.FollowUpDate.Date<=DateTime.Today);return View();}
+}

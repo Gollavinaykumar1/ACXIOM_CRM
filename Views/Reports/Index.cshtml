@@ -1,0 +1,46 @@
+@model List<AcxiomCRM.Controllers.PipelineReportRow>
+
+<div class="pagehead">
+    <div>
+        <div class="eyebrow">BUSINESS INTELLIGENCE</div>
+        <h1>Reports</h1>
+        <div class="muted">Pipeline summaries and exportable CRM data.</div>
+    </div>
+    <a asp-action="ExportCustomers" class="btn btn-primary">
+        Export customers CSV
+    </a>
+</div>
+
+<div class="panel">
+    <h3>Pipeline by stage</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Stage</th>
+                    <th>Pipeline amount</th>
+                    <th>Weighted amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var x in Model)
+                    {
+                        <tr>
+                            <td>@x.Stage</td>
+                            <td>@x.Amount.ToString("C0")</td>
+                            <td>@x.Weighted.ToString("C0")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">No opportunity data available.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
